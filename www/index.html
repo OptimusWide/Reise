@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2016 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *" />
+    <!-- Good default declaration:
+    * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of eval() and inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+        * Enable inline JS: add 'unsafe-inline' to default-src
+        * Enable eval(): add 'unsafe-eval' to default-src
+    * Create your own at http://cspisawesome.com
+    -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+	
+	<style>
+		ul.topmenu {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+			background-color: #333;
+			position: fixed;
+			top: 0;
+			width: 100%;
+			z-index: 100;
+		}
+
+		li.topmenu {
+			float: left;
+		}
+
+		li.topmenu a {
+			font-size: 20px;
+			display: block;
+			color: white;
+			padding: 16px;
+			text-decoration: none;
+		}
+
+
+		.sidenav {
+			height: 100%;
+			width: 0;
+			position: fixed;
+			z-index: 1;
+			top: 0;
+			left: 0;
+			background-color: #111;
+			overflow-x: hidden;
+			transition: 0.5s;
+			padding-top: 80px;
+
+		}
+
+		.sidenav a {
+			padding: 8px 8px 8px 32px;
+			text-decoration: none;
+			font-size: 20px;
+			color: #818181;
+			display: block;
+			transition: 0.3s
+		}
+
+		.sidenav a:hover, .offcanvas a:focus{
+			color: #f1f1f1;
+		}
+
+		.sidenav .closebtn {
+			position: absolute;
+			top: 50px;
+			right: 15px;
+			font-size: 36px;
+			margin-left: 50px;
+		}
+
+		div.appbody {
+			padding-top: 60px;
+			padding-left: 60px;
+		}
+		
+		
+		
+		
+		/* The Modal (background) */
+		.modal {
+			display: none; /* Hidden by default */
+			position: fixed; /* Stay in place */
+			z-index: 100; /* Sit on top */
+			padding-top: 100px; /* Location of the box */
+			left: 0;
+			top: 0;
+			width: 100%; /* Full width */
+			height: 100%; /* Full height */
+			overflow: auto; /* Enable scroll if needed */
+			background-color: rgb(0,0,0); /* Fallback color */
+			background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+		}
+
+		/* Modal Content */
+		.modal-content {
+			position: relative;
+			background-color: #fefefe;
+			margin: auto;
+			padding: 0;
+			border: 1px solid #888;
+			width: 80%;
+			box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+			-webkit-animation-name: animatetop;
+			-webkit-animation-duration: 0.4s;
+			animation-name: animatetop;
+			animation-duration: 0.4s
+		}
+
+		/* Add Animation */
+		@-webkit-keyframes animatetop {
+			from {top:-300px; opacity:0} 
+			to {top:0; opacity:1}
+		}
+
+		@keyframes animatetop {
+			from {top:-300px; opacity:0}
+			to {top:0; opacity:1}
+		}
+
+		
+		.exit {
+			padding-left: 0px;
+		}
+		
+		/* Yes - No Buttons */
+		.exit button {
+		  -webkit-border-radius: 10;
+		  -moz-border-radius: 10;
+		  border-radius: 5px;
+		  color: #ffffff;
+		  font-size: 14px;
+		  background: #3498db;
+		  padding: 3px 10px 3px 10px;
+		  text-decoration: none;
+		  margin-right: 15px;
+		  border: 1px solid blue;
+		}
+		
+		
+		/* The Close Button */
+		.close {
+			color: white;
+			float: right;
+			font-size: 28px;
+			font-weight: bold;
+		}
+
+		.close:hover,
+		.close:focus {
+			color: #000;
+			text-decoration: none;
+			cursor: pointer;
+		}
+
+		.modal-header {
+			padding: 2px 16px;
+			background-color: #5cb85c;
+			color: white;
+		}
+
+		.modal-body {padding: 10px 10px 10px 10px;}
+		
+		
+		.appparty {
+			margin: 100px 20px 20px 20px;
+			display: none;
+		}
+		
+		.appinventory {
+			margin: 100px 20px 20px 20px;
+			display: none;
+		}
+		
+		
+	</style>
+	
+    <title>Reise</title>
+</head>
+
+<body>
+	<ul class="topmenu">
+		<li class="topmenu"><a href="#" onclick="openNav()">Reise</a></li>
+	</ul>
+	
+	
+	<div id="SideBar" class="sidenav">
+	  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+	  <a href="#" onclick="navHome()">Home</a>
+	  <a href="#" onclick="navParty()">Party</a>
+	  <a href="#" onclick="navInventory()">Inventory</a>
+	  <a href="#" onclick="exitapp()">Exit</a>
+	</div>
+	
+	<div class="bg">
+    </div>
+	
+    <div id="home" class="app">
+        <h1>PhoneGap</h1>
+        <div id="deviceready" class="blink">
+            <p class="event listening">Connecting to Device</p>
+            <p class="event received">Device is Ready</p>
+        </div>
+		
+		<br><br>
+		<button type="button" id="myBtn2" onclick="getGPS()">GetGPS</button>
+		<br><br>
+		<select id="SelectLocation">
+			<option>Adam's</option>
+			<option>Mom's</option>
+			<option>Fort</option>
+			<option>USS</option>
+			<option>Eric's</option>
+			<option>WI Utah</option>
+		</select>
+		<br><br>
+		<button type="button" id="myBtn3" onclick="writefile()">wFile</button>
+		<button type="button" id="myBtn3" onclick="readfile()">rFile</button>
+		<button type="button" id="myBtn3" onclick="setstatus()">SetFile</button>
+        <div id="test">
+			<p id="gpsinfo"></p>
+        </div>
+
+		<div id="test1">
+			<p id="gpsinfo2"></p>
+        </div>
+		
+		<div id="test2">
+			<p id="fileinfo"></p>
+        </div>
+		
+    </div>
+	
+	
+	
+	<div id="party" class="appparty">
+		<p>Here's the Party!</p>
+    </div>
+	
+	
+	
+	<div id="inventory" class="appinventory">
+		<p>Hmmm... what's in our inventory?</p>
+    </div>
+	
+	
+	
+	<!-- The Exit Modal Window-->
+	<div id="exitModal" class="modal">
+	  <!-- Modal content -->
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <span class="close">×</span>
+		  <h2>Exit Reise?</h2>
+		</div>
+		<div class="modal-body">
+		  <p id="exittext"></p>
+		  <span class="exit">
+			  <button type="button" onclick="onConfirmExit()">Yes</button>
+			  <button type="button" onclick="closemodal()">No</button>
+		  </span>
+		</div>
+	  </div>
+	</div>
+
+	
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript">
+        app.initialize();
+    </script>
+	
+	
+	<script>
+		function navHome() {
+			document.getElementById("home").style.display = "block";
+			document.getElementById("party").style.display = "none";
+			document.getElementById("inventory").style.display = "none";
+			closeNav();
+		}
+		
+		function navParty() {
+			document.getElementById("party").style.display = "block";
+			document.getElementById("home").style.display = "none";
+			document.getElementById("inventory").style.display = "none";
+			closeNav();
+		}
+		
+		function navInventory() {
+			document.getElementById("inventory").style.display = "block";
+			document.getElementById("home").style.display = "none";
+			document.getElementById("party").style.display = "none";
+			closeNav();
+		}
+	</script>
+	
+	
+	
+	<script>
+		function openNav() {
+			document.getElementById("SideBar").style.width = "200px";
+			document.getElementById("textbox").innerHTML = "Menu Open";
+		}
+		
+		function closeNav() {
+			document.getElementById("SideBar").style.width = "0";
+			document.getElementById("textbox").innerHTML = "Menu Closed";
+		}
+	</script>
+
+	
+	<script>
+		// Get the modal
+		var modal = document.getElementById('exitModal');
+
+		// Get the <span> element that closes the modal
+		var span = document.getElementsByClassName("close")[0];
+
+		var exitmessage = [
+			'Dost thou wish to leave with such hasty abandon?',
+			'So, you think you can quit this easily, huh?',
+			'Chickening out… already?',
+			'Heroes, press N.  Wimps, press Y.',
+			'Press N to save the world.  Press Y to abandon it in its hour of need.',
+			'Press N for more carnage.  Press Y to be a weenie.',
+			'For guns and glory, press N.  For work and worry, press Y.',
+			'Press N if you are brave.  Press Y to cower in shame.',
+			'You are at an intersection.  A sign says, Press Y to quit.',
+		];
+
+		// When the user clicks the button, open the modal 
+		function exitapp() {
+			var exitnum = Math.floor(Math.random() * 9);
+			document.getElementById("exittext").innerHTML = exitmessage[exitnum];
+			modal.style.display = "block";
+			closeNav();
+		}
+
+		// When the user clicks on <span> (x), close the modal
+		span.onclick = function() {
+			closemodal();
+			//modal.style.display = "none";
+		}
+
+		// When the user clicks anywhere outside of the modal, close it
+		window.onclick = function(event) {
+			if (event.target == modal) {
+				closemodal();
+				//modal.style.display = "none";
+			}
+		}
+		
+		function closemodal() {
+			modal.style.display = "none";
+		}
+		
+	</script>
+	
+</body>
+</html>
